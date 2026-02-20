@@ -13,6 +13,7 @@
     "prepare:prisma:sqlite": "prisma generate --schema src/sqlite/schema.prisma",
     "start:prisma": "tsx ./src/prisma-server-node.ts",
     "start:drizzle": "tsx ./src/drizzle-server-node.ts",
+    "start:typeorm": "tsx ./src/typeorm-server-node.ts",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
@@ -55,6 +56,8 @@
     "pg": "^8.16.3",
     "pidusage": "^3.0.2",
     "prisma": "^7.1.0",
-    "ramda": "^0.29.0"
+    "ramda": "^0.29.0",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.28"
   }
 }
