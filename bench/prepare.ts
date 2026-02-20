@@ -31,17 +31,20 @@ const main = async () => {
 
   const data: Record<string, any[]> = {};
   for (const testName of files) {
+    const cpuUsageFilename = `${folder}/cpu-usage-${testName}.csv`;
+    const coreColumns = fs.readFileSync(cpuUsageFilename, 'utf8').split(/\r?\n/)[0]
+    .split(',')
+    .slice(0, -1);
+
+    const cpuAverageExpr = `(${coreColumns.join(' + ')}) / ${coreColumns.length}`;
     const result = await connection.run(
       `
       WITH cpu_usage AS (
         SELECT
           time_bucket(INTERVAL '1s', epoch_ms(timestamp)) AS "time",
-          AVG(core1) AS "core1",
-          AVG(core2) AS "core2",
-          AVG(core3) AS "core3",
-          AVG(core4) AS "core4"
+          AVG(${cpuAverageExpr}) AS "cpu_average"
         FROM
-          read_csv('${folder}/cpu-usage-${testName}.csv')
+          read_csv('${cpuUsageFilename}')
         GROUP BY time
         ORDER BY time ASC
       ), reqs_per_sec AS (
@@ -76,10 +79,7 @@ const main = async () => {
       )
       SELECT
         cpu_usage.time,
-        cpu_usage.core1,
-        cpu_usage.core2,
-        cpu_usage.core3,
-        cpu_usage.core4,
+        cpu_usage.cpu_average,
         reqs_per_sec.reqs_per_sec,
         fail_reqs_per_sec.fail_reqs_per_sec,
         req_duration.latency_95,
@@ -96,7 +96,9 @@ const main = async () => {
     );
 
     console.log(`Processing ${testName}...`);
-    data[testName] = await result.getRowObjectsJS();
+    const resultData = await result.getRowObjectsJS();
+    fs.writeFileSync(`${folder}/${testName}.json`, JSON.stringify(resultData, null, 2));
+    data[testName]
   }
 
   console.log('All data processed');

@@ -8,7 +8,7 @@ interface CpuUsage {
 
 const app = new Hono();
 
-let temp: CpuUsage[] = [];
+let previous: CpuUsage[] = [];
 
 app.get('/stats', (c) => {
   const cpus = os.cpus();
@@ -20,14 +20,14 @@ app.get('/stats', (c) => {
   });
 
   let result: number[] = [];
-  if (temp.length > 0) {
+  if (previous.length > 0) {
     result = cpuUsage.map((cpu, index) => {
-      const usageDiff = cpu.usage - temp[index].usage;
-      const totalDiff = cpu.total - temp[index].total;
+      const usageDiff = cpu.usage - previous[index].usage;
+      const totalDiff = cpu.total - previous[index].total;
       return parseInt(((100 * usageDiff) / totalDiff).toFixed());
     });
   }
-  temp = cpuUsage;
+  previous = cpuUsage;
 
   return c.json(result);
 });

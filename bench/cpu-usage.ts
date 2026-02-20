@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { parseArgs } from 'util';
+import os from 'os';
 
 const {
   values: { host, name, folder },
@@ -35,9 +36,9 @@ if (!folder) {
 
 const filename = `${folder}/cpu-usage-${name}.csv`;
 
-fs.writeFileSync(filename, 'core1,core2,core3,core4,timestamp\n', {
-  flag: 'w', // 'w' means create a new file only if it does not exist
-});
+let coreCount = os.cpus().length;
+const coresHeader = Array.from({ length: coreCount }, (_, index) => `core${index + 1}`).join(',');
+fs.writeFileSync(filename, `${coresHeader},timestamp\n`);
 
 async function withRetries<T>(fn: () => Promise<T>, retries = 5): Promise<T> {
   let lastError: unknown;
@@ -58,21 +59,11 @@ setInterval(() => {
   withRetries(() => fetch(`${host}/stats`))
     .then((res) => res.json() as Promise<number[]>)
     .then((data) => {
-      const [core1, core2, core3, core4] = data;
-
-      if (
-        core1 === undefined ||
-        core2 === undefined ||
-        core3 === undefined ||
-        core4 === undefined ||
-        core1 === null ||
-        core2 === null ||
-        core3 === null ||
-        core4 === null
-      ) {
+      // First request returns empty array
+      if (data.length === 0) {
         return;
       }
 
-      fs.appendFileSync(filename, `${core1},${core2},${core3},${core4},${new Date().getTime()}\n`);
+      fs.appendFileSync(filename, `${data.join(',')},${new Date().getTime()}\n`);
     });
 }, 200);
