@@ -41,18 +41,17 @@ pnpm start:prisma
 ```
 
 ## Prepare testing machine
-1. Generate a list of http requests with `pnpm start:generate`. It will output a list of http requests to be run on the tested server | `./data/requests.json`
+1. Generate a list of http requests with `pnpm start:generate`. It will output a list of http requests to be run to `./data/requests.json`
 2. Install [k6 load tester](https://k6.io/)
-3. Run benchmarks 🚀  
-Use the built-in benchmark runner:
+3. Run benchmarks 🚀
 ```bash
-tsx bench/index --host http://192.168.31.144:3000 --name my-bench --folder results
-
-http://192.168.31.144:3000 // drizzle
-http://192.168.31.144:3001 // prisma
+pnpm tsx bench/index --host http://<your server IP>:3000 --name my-bench --folder results
 ```
-4. Prepare final combined results  
-After benchmarks finish, merge all outputs into a single JSON file:
+Default ports are:
+- 3000 - drizzle
+- 3001 - prisma
+- 3002 - go
+4. After benchmarks finish, merge all outputs into a single JSON file:
 ```bash
-tsx bench/prepare --folder results
+pnpm tsx bench/prepare --folder results
 ```
