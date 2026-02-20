@@ -6,10 +6,10 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Hono } from 'hono';
 import os from 'os';
 import pg from 'pg';
-import cpuUsage from './cpu-usage';
-import { relations } from './relations';
-import * as schema from './schema';
-import { customers, details, orders, products } from './schema';
+import cpuUsage from './cpu-usage.ts';
+import { relations } from './relations.ts';
+import * as schema from './schema.ts';
+import { customers, details, orders, products } from './schema.ts';
 
 const numCPUs = os.cpus().length;
 

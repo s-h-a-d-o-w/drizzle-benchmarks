@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
 import { drizzle } from 'drizzle-orm/bun-sql';
-import { relations } from './relations';
-import * as schema from './schema';
+import { relations } from './relations.ts';
+import * as schema from './schema.ts';
 import { eq, sql, asc } from 'drizzle-orm';
-import cpuUsage from './cpu-usage';
-import { customers, details, employees, orders, products, suppliers } from './schema';
+import cpuUsage from './cpu-usage.ts';
+import { customers, details, employees, orders, products, suppliers } from './schema.ts';
 import 'dotenv/config';
 // import pg from 'pg';
 import cluster from 'cluster';

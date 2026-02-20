@@ -1,8 +1,8 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
-import { PrismaClient } from './generated/prisma/client';
+import { PrismaClient } from './generated/prisma/client.ts';
 import { PrismaPg } from '@prisma/adapter-pg';
-import cpuUsage from './cpu-usage';
+import cpuUsage from './cpu-usage.ts';
 import 'dotenv/config';
 import pg from 'pg';
 
@@ -11,7 +11,9 @@ import os from 'os';
 const numCPUs = os.cpus().length;
 
 // const pool = new pg.native!.Pool({ connectionString: process.env.DATABASE_URL, max: 8, min: 8 });
-const adapter = new PrismaPg({connectionString: process.env.DATABASE_URL});
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+});
 // const adapter = new PrismaPg(pool); // when pool provided - doesnt work
 const prisma = new PrismaClient({ adapter });
 
@@ -143,7 +145,7 @@ app.get('/orders-with-details', async (c) => {
     },
   });
 
-  const result = res.map((item) => {
+  const result = res.map((item: any) => {
     return {
       id: item.id,
       shippedDate: item.shippedDate,
@@ -151,8 +153,8 @@ app.get('/orders-with-details', async (c) => {
       shipCity: item.shipCity,
       shipCountry: item.shipCountry,
       productsCount: item.details.length,
-      quantitySum: item.details.reduce((sum, deteil) => (sum += +deteil.quantity), 0),
-      totalPrice: item.details.reduce((sum, deteil) => (sum += +deteil.quantity * +deteil.unitPrice), 0),
+      quantitySum: item.details.reduce((sum: any, deteil: any) => (sum += +deteil.quantity), 0),
+      totalPrice: item.details.reduce((sum: any, deteil: any) => (sum += +deteil.quantity * +deteil.unitPrice), 0),
     };
   });
   return c.json(result);
@@ -168,7 +170,7 @@ app.get('/order-with-details', async (c) => {
     },
   });
 
-  const result = res.map((item) => {
+  const result = res.map((item: any) => {
     return {
       id: item.id,
       shippedDate: item.shippedDate,
@@ -176,8 +178,8 @@ app.get('/order-with-details', async (c) => {
       shipCity: item.shipCity,
       shipCountry: item.shipCountry,
       productsCount: item.details.length,
-      quantitySum: item.details.reduce((sum, detail) => (sum += detail.quantity), 0),
-      totalPrice: item.details.reduce((sum, detail) => (sum += detail.quantity * detail.unitPrice), 0),
+      quantitySum: item.details.reduce((sum: any, detail: any) => (sum += detail.quantity), 0),
+      totalPrice: item.details.reduce((sum: any, detail: any) => (sum += detail.quantity * detail.unitPrice), 0),
     };
   });
 

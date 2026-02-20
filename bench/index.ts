@@ -50,7 +50,7 @@ const { result } = concurrently(
   ],
   {
     prefix: 'name',
-    killOthers: ['failure', 'success'],
+    killOthersOn: ['failure', 'success'],
   },
 );
 result.then(() => console.log('All done!'));
