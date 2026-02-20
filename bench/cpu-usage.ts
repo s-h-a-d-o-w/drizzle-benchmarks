@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { parseArgs } from 'util';
 import os from 'os';
+import { StatsResponse } from '../src/cpu-usage.ts';
 
 const {
   values: { host, name, folder },
@@ -34,11 +35,15 @@ if (!folder) {
   throw new Error('folder is required');
 }
 
-const filename = `${folder}/cpu-usage-${name}.csv`;
+const cpuFilename = `${folder}/cpu-usage-${name}.csv`;
+const memoryFilename = `${folder}/memory-${name}.csv`;
+const gcFilename = `${folder}/gc-${name}.csv`;
 
 let coreCount = os.cpus().length;
 const coresHeader = Array.from({ length: coreCount }, (_, index) => `core${index + 1}`).join(',');
-fs.writeFileSync(filename, `${coresHeader},timestamp\n`);
+fs.writeFileSync(cpuFilename, `${coresHeader},timestamp\n`);
+fs.writeFileSync(memoryFilename, `heapUsed,heapTotal,external,rss,usedHeapSize,totalHeapSize,heapSizeLimit,mallocedMemory,timestamp\n`);
+fs.writeFileSync(gcFilename, `gcCount,gcTotalPauseMs,majorCount,minorCount,timestamp\n`);
 
 async function withRetries<T>(fn: () => Promise<T>, retries = 5): Promise<T> {
   let lastError: unknown;
@@ -57,13 +62,29 @@ async function withRetries<T>(fn: () => Promise<T>, retries = 5): Promise<T> {
 
 setInterval(() => {
   withRetries(() => fetch(`${host}/stats`))
-    .then((res) => res.json() as Promise<number[]>)
+    .then((res) => res.json() as Promise<StatsResponse | number[]>)
     .then((data) => {
-      // First request returns empty array
-      if (data.length === 0) {
+      const timestamp = new Date().getTime();
+
+      if (Array.isArray(data)) {
+        if (data.length === 0) return;
+        fs.appendFileSync(cpuFilename, `${data.join(',')},${timestamp}\n`);
         return;
       }
 
-      fs.appendFileSync(filename, `${data.join(',')},${new Date().getTime()}\n`);
+      if (data.cpu.length === 0) return;
+
+      fs.appendFileSync(cpuFilename, `${data.cpu.join(',')},${timestamp}\n`);
+
+      const { memory, heap, gc } = data;
+      fs.appendFileSync(
+        memoryFilename,
+        `${memory.heapUsed},${memory.heapTotal},${memory.external},${memory.rss},${heap.usedHeapSize},${heap.totalHeapSize},${heap.heapSizeLimit},${heap.mallocedMemory},${timestamp}\n`
+      );
+
+      fs.appendFileSync(
+        gcFilename,
+        `${gc.count},${gc.totalPauseMs.toFixed(2)},${gc.majorCount},${gc.minorCount},${timestamp}\n`
+      );
     });
 }, 200);

@@ -11,9 +11,9 @@
     "start:generate": "tsx ./src/generate.ts",
     "prepare:prisma": "prisma generate --schema src/schema.prisma",
     "prepare:prisma:sqlite": "prisma generate --schema src/sqlite/schema.prisma",
-    "start:prisma": "tsx ./src/prisma-server-node.ts",
-    "start:drizzle": "tsx ./src/drizzle-server-node.ts",
-    "start:typeorm": "tsx ./src/typeorm-server-node.ts",
+    "start:prisma": "node --expose-gc --import tsx ./src/prisma-server-node.ts",
+    "start:drizzle": "node --expose-gc --import tsx ./src/drizzle-server-node.ts",
+    "start:typeorm": "node --expose-gc --import tsx ./src/typeorm-server-node.ts",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
