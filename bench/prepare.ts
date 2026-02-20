@@ -58,7 +58,7 @@ const main = async () => {
           SUM(metric_value) AS "fail_reqs_per_sec"
         FROM
           "${folder}/${testName}.parquet"
-        WHERE 
+        WHERE
           metric_name = 'http_req_failed'
         GROUP BY time
       ), req_duration AS (
@@ -101,7 +101,7 @@ const main = async () => {
 
   console.log('All data processed');
   // Do something with the data
-  fs.writeFileSync('data.json', JSON.stringify(data, null, 2));
+  fs.writeFileSync(`${folder}/combined-results.json`, JSON.stringify(data, null, 2));
 };
 
 main().catch((err) => {
