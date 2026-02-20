@@ -12,7 +12,8 @@
     "prepare:prisma": "prisma generate --schema src/schema.prisma",
     "prepare:prisma:sqlite": "prisma generate --schema src/sqlite/schema.prisma",
     "start:prisma": "tsx ./src/prisma-server-node.ts",
-    "start:drizzle": "tsx ./src/drizzle-server-node.ts"
+    "start:drizzle": "tsx ./src/drizzle-server-node.ts",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
