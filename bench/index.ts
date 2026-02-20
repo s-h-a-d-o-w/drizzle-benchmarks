@@ -44,7 +44,7 @@ const { result } = concurrently(
   [
     { command: `tsx bench/cpu-usage.ts --host ${host} --name ${name} --folder ${folder}`, name: 'cpu-usage' },
     {
-      command: `sleep 1 && k6 run -e HOST=${host} bench/bench.js --out csv=${folder}/${name}.csv && duckdb :memory: "COPY (SELECT * FROM '${folder}/${name}.csv') TO '${folder}/${name}.parquet' (FORMAT 'parquet');" && rm ${folder}/${name}.csv`,
+      command: `node -e "setTimeout(() => process.exit(0), 1000)" && k6 run -e HOST=${host} bench/bench.js --out csv=${folder}/${name}.csv && duckdb :memory: "COPY (SELECT * FROM '${folder}/${name}.csv') TO '${folder}/${name}.parquet' (FORMAT 'parquet');" && node -e "require('node:fs').unlinkSync('${folder}/${name}.csv')"`,
       name: 'bench',
     },
   ],
