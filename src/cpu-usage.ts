@@ -31,6 +31,7 @@ export interface StatsResponse {
 }
 
 const app = new Hono();
+const extendedMetricsEnabled = process.argv.includes('--extended-metrics');
 
 let previous: CpuUsage[] = [];
 
@@ -41,23 +42,25 @@ let gcStats = {
   minorCount: 0,
 };
 
-try {
-  const obs = new PerformanceObserver((list) => {
-    for (const entry of list.getEntries()) {
-      gcStats.count++;
-      gcStats.totalPauseMs += entry.duration;
-      const detail = (entry as any).detail as { kind?: number } | undefined;
-      if (detail && typeof detail === 'object') {
-        if (detail.kind === constants.NODE_PERFORMANCE_GC_MAJOR) {
-          gcStats.majorCount++;
-        } else if (detail.kind === constants.NODE_PERFORMANCE_GC_MINOR) {
-          gcStats.minorCount++;
+if (extendedMetricsEnabled) {
+  try {
+    const obs = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        gcStats.count++;
+        gcStats.totalPauseMs += entry.duration;
+        const detail = (entry as any).detail as { kind?: number } | undefined;
+        if (detail && typeof detail === 'object') {
+          if (detail.kind === constants.NODE_PERFORMANCE_GC_MAJOR) {
+            gcStats.majorCount++;
+          } else if (detail.kind === constants.NODE_PERFORMANCE_GC_MINOR) {
+            gcStats.minorCount++;
+          }
         }
       }
-    }
-  });
-  obs.observe({ entryTypes: ['gc'], buffered: true });
-} catch {
+    });
+    obs.observe({ entryTypes: ['gc'], buffered: true });
+  } catch {
+  }
 }
 
 app.get('/stats', (c) => {
@@ -78,6 +81,10 @@ app.get('/stats', (c) => {
     });
   }
   previous = cpuUsage;
+
+  if (!extendedMetricsEnabled) {
+    return c.json(cpuResult);
+  }
 
   const mem = process.memoryUsage();
   const heapStats = v8.getHeapStatistics();

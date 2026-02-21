@@ -44,6 +44,8 @@ pnpm start:prisma
 
 ## TypeORM
 pnpm start:typeorm
+
+(Use `-- --extended-metrics` to enable metrics on GC and memory usage)
 ```
 1. Generate a list of http requests with `pnpm start:generate`. It will output a list of http requests to be run to `./data/requests.json`
 1. Install [k6 load tester](https://k6.io/)

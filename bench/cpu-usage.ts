@@ -42,8 +42,7 @@ const gcFilename = `${folder}/gc-${name}.csv`;
 let coreCount = os.cpus().length;
 const coresHeader = Array.from({ length: coreCount }, (_, index) => `core${index + 1}`).join(',');
 fs.writeFileSync(cpuFilename, `${coresHeader},timestamp\n`);
-fs.writeFileSync(memoryFilename, `heapUsed,heapTotal,external,rss,usedHeapSize,totalHeapSize,heapSizeLimit,mallocedMemory,timestamp\n`);
-fs.writeFileSync(gcFilename, `gcCount,gcTotalPauseMs,majorCount,minorCount,timestamp\n`);
+let hasWrittenExtendedHeaders = false;
 
 async function withRetries<T>(fn: () => Promise<T>, retries = 5): Promise<T> {
   let lastError: unknown;
@@ -64,19 +63,28 @@ setInterval(() => {
   withRetries(() => fetch(`${host}/stats`))
     .then((res) => res.json() as Promise<StatsResponse | number[]>)
     .then((data) => {
+      if (Array.isArray(data) && data.length === 0 || ('cpu' in data && data.cpu.length === 0)) return;
+
       const timestamp = new Date().getTime();
 
+      // Simple metrics
       if (Array.isArray(data)) {
-        if (data.length === 0) return;
         fs.appendFileSync(cpuFilename, `${data.join(',')},${timestamp}\n`);
         return;
       }
 
-      if (data.cpu.length === 0) return;
-
+      // Extended metrics
       fs.appendFileSync(cpuFilename, `${data.cpu.join(',')},${timestamp}\n`);
 
       const { memory, heap, gc } = data;
+      if (!hasWrittenExtendedHeaders) {
+        fs.writeFileSync(
+          memoryFilename,
+          `heapUsed,heapTotal,external,rss,usedHeapSize,totalHeapSize,heapSizeLimit,mallocedMemory,timestamp\n`
+        );
+        fs.writeFileSync(gcFilename, `gcCount,gcTotalPauseMs,majorCount,minorCount,timestamp\n`);
+        hasWrittenExtendedHeaders = true;
+      }
       fs.appendFileSync(
         memoryFilename,
         `${memory.heapUsed},${memory.heapTotal},${memory.external},${memory.rss},${heap.usedHeapSize},${heap.totalHeapSize},${heap.heapSizeLimit},${heap.mallocedMemory},${timestamp}\n`
