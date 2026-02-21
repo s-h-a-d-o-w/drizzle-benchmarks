@@ -62,3 +62,7 @@ Default ports are:
 ```bash
 node bench/prepare.ts --folder results
 ```
+1. (Optional) Export any metric from the individual JSON files into a CSV for possibly easier graph creation:
+```bash
+node bench/export-metric.ts --folder results --metric reqs_per_sec
+```
