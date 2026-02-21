@@ -5,7 +5,7 @@ import http from 'k6/http';
 
 const data = new SharedArray('requests', function () {
   // return JSON.parse(open('./data/requests.json'));
-  return JSON.parse(open('../data/requests.json')).filter((it) => !it.startsWith('/search'));
+  return JSON.parse(open('../data/requests.json')).filter((it: any) => !it.startsWith('/search'));
 });
 
 const host = __ENV.HOST || `http://192.168.31.144:3000`; // drizzle

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { parseArgs } from 'util';
 import os from 'os';
-import { StatsResponse } from '../src/cpu-usage.ts';
+import type { StatsResponse } from '../src/cpu-usage.ts';
 
 const {
   values: { host, name, folder },

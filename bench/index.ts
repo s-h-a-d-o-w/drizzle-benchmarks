@@ -1,4 +1,5 @@
 import concurrently from 'concurrently';
+import type { CloseEvent } from 'concurrently';
 import fs from 'fs';
 import { parseArgs } from 'util';
 
@@ -42,9 +43,9 @@ fs.mkdirSync(folder, { recursive: true });
 
 const { result } = concurrently(
   [
-    { command: `tsx bench/cpu-usage.ts --host ${host} --name ${name} --folder ${folder}`, name: 'cpu-usage' },
+    { command: `node bench/cpu-usage.ts --host ${host} --name ${name} --folder ${folder}`, name: 'cpu-usage' },
     {
-      command: `node -e "setTimeout(() => process.exit(0), 1000)" && k6 run -e HOST=${host} bench/bench.js --out csv=${folder}/${name}.csv && duckdb :memory: "COPY (SELECT * FROM '${folder}/${name}.csv') TO '${folder}/${name}.parquet' (FORMAT 'parquet');" && node -e "require('node:fs').unlinkSync('${folder}/${name}.csv')"`,
+      command: `node -e "setTimeout(() => process.exit(0), 1000)" && k6 run -e HOST=${host} bench/bench.ts --out csv=${folder}/${name}.csv && duckdb :memory: "COPY (SELECT * FROM '${folder}/${name}.csv') TO '${folder}/${name}.parquet' (FORMAT 'parquet');" && node -e "require('node:fs').unlinkSync('${folder}/${name}.csv')"`,
       name: 'bench',
     },
   ],
@@ -53,4 +54,15 @@ const { result } = concurrently(
     killOthersOn: ['failure', 'success'],
   },
 );
-result.then(() => console.log('All done!'));
+result
+  .then(() => console.log('All done!'))
+  .catch((closeEvents: CloseEvent[]) => {
+    const errored = closeEvents.filter(({killed, exitCode}) => !killed && exitCode !== 0);
+    if (errored.length > 0) {
+      errored.forEach(({command: {name}, exitCode}) => {
+        console.error(`${name} was not killed, exited with code ${exitCode}`);
+      });
+      process.exit(1);
+    }
+    console.log('All done!');
+  });

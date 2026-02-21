@@ -32,7 +32,7 @@ main("micro"); // nano | micro
 
 ## Prepare test machine
 
-1. Make sure you have Node version 18 installed or above, we've used Node v24. You can use [`nvm use 24`](https://github.com/nvm-sh/nvm) command
+1. Make sure you have Node >=24 (or >=22.18.0 for 22) installed.
 1. Start Drizzle/Prisma server:
 ```bash
 ## Drizzle
@@ -49,7 +49,7 @@ pnpm start:typeorm
 1. Install [k6 load tester](https://k6.io/)
 1. Run benchmarks 🚀
 ```bash
-pnpm tsx bench/index --host http://<your server IP>:3000 --name my-bench --folder results
+node bench/index.ts --host http://<your server IP>:3000 --name my-bench --folder results
 ```
 Default ports are:
 - 3000 - drizzle
@@ -58,5 +58,5 @@ Default ports are:
 - 3003 - typeorm
 1. After benchmarks finish, merge all outputs into a single JSON file:
 ```bash
-pnpm tsx bench/prepare --folder results
+node bench/prepare.ts --folder results
 ```
