@@ -45,6 +45,9 @@ pnpm start:prisma
 ## TypeORM
 pnpm start:typeorm
 
+## pg (raw SQL)
+pnpm start:pg
+
 (Use `-- --extended-metrics` to enable metrics on GC and memory usage)
 ```
 1. Generate a list of http requests with `pnpm start:generate`. It will output a list of http requests to be run to `./data/requests.json`
@@ -58,6 +61,7 @@ Default ports are:
 - 3001 - prisma
 - 3002 - go
 - 3003 - typeorm
+- 3004 - pg raw sql
 1. After benchmarks finish, merge all outputs into a single JSON file:
 ```bash
 node bench/prepare.ts --folder results

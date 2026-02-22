@@ -13,6 +13,7 @@
     "prepare:prisma:sqlite": "prisma generate --schema src/sqlite/schema.prisma",
     "start:prisma": "node ./src/prisma-server-node.ts",
     "start:drizzle": "node ./src/drizzle-server-node.ts",
+    "start:pg": "node ./src/pg-server-node.ts",
     "start:drizzle:gc": "node --expose-gc ./src/drizzle-server-node-gc.ts",
     "start:typeorm": "node ./src/typeorm-server-node.ts",
     "typecheck": "tsc --noEmit"
