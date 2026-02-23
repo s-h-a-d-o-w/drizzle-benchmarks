@@ -1,6 +1,6 @@
 node_modules
 test
-results
+results*
 dist
 data.json
 /data

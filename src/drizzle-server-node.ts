@@ -11,7 +11,7 @@ import { relations } from './relations.ts';
 import * as schema from './schema.ts';
 import { customers, details, orders, products } from './schema.ts';
 
-const numCPUs = os.cpus().length;
+const numCPUs = os.availableParallelism();
 
 const pool = new pg.native!.Pool({ connectionString: process.env.DATABASE_URL });
 const db = drizzle({ client: pool, schema, relations, logger: false });

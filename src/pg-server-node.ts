@@ -6,7 +6,7 @@ import os from 'os';
 import pg from 'pg';
 import cpuUsage from './cpu-usage.ts';
 
-const numCPUs = os.cpus().length;
+const numCPUs = os.availableParallelism();
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 

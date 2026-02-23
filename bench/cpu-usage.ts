@@ -39,7 +39,7 @@ const cpuFilename = `${folder}/cpu-usage-${name}.csv`;
 const memoryFilename = `${folder}/memory-${name}.csv`;
 const gcFilename = `${folder}/gc-${name}.csv`;
 
-let coreCount = os.cpus().length;
+let coreCount = os.availableParallelism();
 const coresHeader = Array.from({ length: coreCount }, (_, index) => `core${index + 1}`).join(',');
 fs.writeFileSync(cpuFilename, `${coresHeader},timestamp\n`);
 let hasWrittenExtendedHeaders = false;

@@ -15,7 +15,7 @@ import {
   SupplierEntity,
 } from './typeorm-schema.ts';
 
-const numCPUs = os.cpus().length;
+const numCPUs = os.availableParallelism();
 
 const parseNumber = (value: string | undefined, fallback = 0) => {
   const parsed = Number(value);

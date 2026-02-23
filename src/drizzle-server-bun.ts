@@ -10,7 +10,7 @@ import 'dotenv/config';
 import cluster from 'cluster';
 import os from 'os';
 
-const numCPUs = os.cpus().length;
+const numCPUs = os.availableParallelism();
 
 const client = new Bun.SQL(process.env.DATABASE_URL!);
 // const client = new pg.Pool({ connectionString: process.env.DATABASE_URL, max: 4, min: 4 });

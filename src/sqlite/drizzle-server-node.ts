@@ -10,7 +10,7 @@ import 'dotenv/config';
 import cluster from 'cluster';
 import os from 'os';
 
-const numCPUs = os.cpus().length;
+const numCPUs = os.availableParallelism();
 
 const client = new Database('src/sqlite/northwind.db');
 const db = drizzle(client, { schema, logger: false });

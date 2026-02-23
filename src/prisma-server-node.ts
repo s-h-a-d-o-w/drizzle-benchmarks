@@ -8,7 +8,7 @@ import pg from 'pg';
 
 import cluster from 'cluster';
 import os from 'os';
-const numCPUs = os.cpus().length;
+const numCPUs = os.availableParallelism();
 
 // const pool = new pg.native!.Pool({ connectionString: process.env.DATABASE_URL, max: 8, min: 8 });
 const adapter = new PrismaPg({

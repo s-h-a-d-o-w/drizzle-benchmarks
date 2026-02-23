@@ -6,7 +6,7 @@ import cpuUsage from './cpu-usage.ts';
 
 import cluster from 'cluster';
 import os from 'os';
-const numCPUs = os.cpus().length;
+const numCPUs = os.availableParallelism();
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
