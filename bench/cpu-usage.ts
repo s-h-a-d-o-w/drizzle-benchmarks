@@ -1,6 +1,5 @@
 import fs from 'fs';
 import { parseArgs } from 'util';
-import os from 'os';
 import type { StatsResponse } from '../src/cpu-usage.ts';
 
 const {
@@ -39,10 +38,14 @@ const cpuFilename = `${folder}/cpu-usage-${name}.csv`;
 const memoryFilename = `${folder}/memory-${name}.csv`;
 const gcFilename = `${folder}/gc-${name}.csv`;
 
-let coreCount = os.availableParallelism();
-const coresHeader = Array.from({ length: coreCount }, (_, index) => `core${index + 1}`).join(',');
-fs.writeFileSync(cpuFilename, `${coresHeader},timestamp\n`);
+let hasWrittenCpuHeader = false;
 let hasWrittenExtendedHeaders = false;
+function writeCpuHeaderIfNeeded(coreCount: number) {
+  if (hasWrittenCpuHeader) return;
+  const coresHeader = Array.from({ length: coreCount }, (_, index) => `core${index + 1}`).join(',');
+  fs.writeFileSync(cpuFilename, `${coresHeader},timestamp\n`);
+  hasWrittenCpuHeader = true;
+}
 
 async function withRetries<T>(fn: () => Promise<T>, retries = 5): Promise<T> {
   let lastError: unknown;
@@ -69,11 +72,13 @@ setInterval(() => {
 
       // Simple metrics
       if (Array.isArray(data)) {
+        writeCpuHeaderIfNeeded(data.length);
         fs.appendFileSync(cpuFilename, `${data.join(',')},${timestamp}\n`);
         return;
       }
 
       // Extended metrics
+      writeCpuHeaderIfNeeded(data.cpu.length);
       fs.appendFileSync(cpuFilename, `${data.cpu.join(',')},${timestamp}\n`);
 
       const { memory, heap, gc } = data;
